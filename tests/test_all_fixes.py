@@ -38,6 +38,7 @@ import shutil
 from difflib import unified_diff
 import unittest
 import logging
+import warnings
 
 from fissix.main import main
 
@@ -104,7 +105,9 @@ def test_check_fixture(in_file, fixer, tmpdir):
 
     # ensure the expected code is actually correct and compiles
     try:
-        compile(''.join(expected_contents), expected_file, 'exec')
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", SyntaxWarning)
+            compile(''.join(expected_contents), expected_file, 'exec')
     except Exception as e:
         pytest.fail(f"FATAL: {expected_file} does not compile: {e}",
                     False)
